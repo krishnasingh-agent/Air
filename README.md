@@ -30,16 +30,7 @@ uvicorn airpad.web:app --host 0.0.0.0 --port "$PORT"
 
 On Windows PowerShell local use, set a port with `$env:PORT=8000` before running a similar command.
 
-### Render settings
 
-| Setting | Value |
-| --- | --- |
-| Root Directory | `.` |
-| Runtime | Python |
-| Python Version | `3.12` |
-| Environment | `Docker` |
-| Dockerfile Path | `./Dockerfile` |
-| Start Command | `uvicorn airpad.web:app --host 0.0.0.0 --port $PORT` |
 
 The hand model is downloaded to `models/hand_landmarker.task` on first processing connection if it is not already committed or available locally. Render's filesystem may be ephemeral, so the service validates and downloads it again after a fresh deployment when necessary.
 
