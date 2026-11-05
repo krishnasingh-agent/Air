@@ -37,7 +37,8 @@ On Windows PowerShell local use, set a port with `$env:PORT=8000` before running
 | Root Directory | `.` |
 | Runtime | Python |
 | Python Version | `3.12` |
-| Build Command | `apt-get update && apt-get install -y libgl1 libgles2 libegl1 && pip install -r requirements.txt` |
+| Environment | `Docker` |
+| Dockerfile Path | `./Dockerfile` |
 | Start Command | `uvicorn airpad.web:app --host 0.0.0.0 --port $PORT` |
 
 The hand model is downloaded to `models/hand_landmarker.task` on first processing connection if it is not already committed or available locally. Render's filesystem may be ephemeral, so the service validates and downloads it again after a fresh deployment when necessary.
