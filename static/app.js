@@ -1,4 +1,4 @@
-const video = document.queryElementById('source');
+const video = document.getElementById('source');
 const canvas = document.getElementById('video');
 const context = canvas.getContext('2d');
 const status = document.getElementById('status');
