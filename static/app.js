@@ -10,6 +10,7 @@ let sendTimer = null;
 let captureCanvas = document.createElement('canvas');
 let running = false;
 let serverReady = false;
+let processedFrameAt = 0;
 
 function setStatus(message, isError = false) {
   status.textContent = message;
@@ -32,8 +33,9 @@ async function startCamera() {
     });
     video.srcObject = stream;
     await video.play();
-    connect();
     running = true;
+    connect();
+    window.requestAnimationFrame(renderPreview);
     stopButton.disabled = false;
   } catch (error) {
     const message = error.name === 'NotAllowedError'
@@ -70,17 +72,34 @@ function connect() {
       if (message.type === 'error') setStatus(message.message, true);
       return;
     }
-    const bitmap = await createImageBitmap(await event.data);
-    canvas.width = bitmap.width;
-    canvas.height = bitmap.height;
-    context.drawImage(bitmap, 0, 0);
-    bitmap.close();
+    const image = await createImageBitmap(await event.data);
+    canvas.width = image.width;
+    canvas.height = image.height;
+    context.drawImage(image, 0, 0);
+    processedFrameAt = performance.now();
+    image.close();
   };
   socket.onerror = () => setStatus('A WebSocket connection error occurred.', true);
   socket.onclose = () => {
     if (running) setStatus('Processing connection closed. Camera stopped.', true);
     stopCamera(false);
   };
+}
+
+function renderPreview() {
+  if (!running) return;
+  if (performance.now() - processedFrameAt > 1200 && video.readyState >= 2) {
+    if (!canvas.width || !canvas.height) {
+      canvas.width = video.videoWidth || 640;
+      canvas.height = video.videoHeight || 480;
+    }
+    context.save();
+    context.translate(canvas.width, 0);
+    context.scale(-1, 1);
+    context.drawImage(video, 0, 0, canvas.width, canvas.height);
+    context.restore();
+  }
+  window.requestAnimationFrame(renderPreview);
 }
 
 function sendFrame() {
