@@ -19,6 +19,12 @@ function setStatus(message, isError = false) {
 
 async function startCamera() {
   startButton.disabled = true;
+  if (stream && stream.getTracks().some((track) => track.readyState === 'live')) {
+    running = true;
+    connect();
+    stopButton.disabled = false;
+    return;
+  }
   setStatus('Waiting for camera permission…');
   try {
     if (!window.isSecureContext) {
@@ -81,13 +87,20 @@ function connect() {
   };
   socket.onerror = () => setStatus('A WebSocket connection error occurred.', true);
   socket.onclose = () => {
-    if (running) setStatus('Processing connection closed. Camera stopped.', true);
-    stopCamera(false);
+    if (running) {
+      setStatus('Processing connection closed. Camera preview remains on; retry by stopping and starting the camera.', true);
+      serverReady = false;
+      if (sendTimer) clearInterval(sendTimer);
+      sendTimer = null;
+      if (socket) socket = null;
+      stopButton.disabled = false;
+      startButton.disabled = false;
+    }
   };
 }
 
 function renderPreview() {
-  if (!running) return;
+  if (!stream) return;
   if (performance.now() - processedFrameAt > 1200 && video.readyState >= 2) {
     if (!canvas.width || !canvas.height) {
       canvas.width = video.videoWidth || 640;

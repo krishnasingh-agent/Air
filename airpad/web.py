@@ -121,12 +121,17 @@ async def websocket_stream(websocket: WebSocket) -> None:
             if not data:
                 continue
 
-            frame = await loop.run_in_executor(None, decode_frame, data)
-            if engine is None:
-                engine = AirPadEngine(cfg, (frame.shape[1], frame.shape[0]))
-            processed = await loop.run_in_executor(None, engine.process, frame, time.monotonic())
-            encoded = await loop.run_in_executor(None, encode_frame, processed)
-            await websocket.send_bytes(encoded)
+            try:
+                frame = await loop.run_in_executor(None, decode_frame, data)
+                if engine is None:
+                    engine = AirPadEngine(cfg, (frame.shape[1], frame.shape[0]))
+                processed = await loop.run_in_executor(None, engine.process, frame, time.monotonic())
+                encoded = await loop.run_in_executor(None, encode_frame, processed)
+                await websocket.send_bytes(encoded)
+            except Exception as exc:
+                # Keep the camera preview and connection alive when one frame is
+                # invalid or the model encounters a transient processing error.
+                await send_error(websocket, f"Frame processing failed: {exc}")
     except WebSocketDisconnect:
         pass
     except Exception as exc:
