@@ -4,7 +4,45 @@ Write and draw in the air with your index finger. Your webcam tracks your hand
 (MediaPipe hand landmarks), gestures lift and lower the pen, and ink is drawn
 over the live camera view or on a clean board.
 
-## Quick start (Windows)
+## Browser web service (recommended)
+
+Python 3.12 is recommended for the production and local web environments.
+
+### Local setup
+
+```bash
+python -m venv .venv
+# Windows: .venv\Scripts\activate
+# macOS/Linux: source .venv/bin/activate
+python -m pip install -r requirements.txt
+uvicorn airpad.web:app --host 0.0.0.0 --port 8000 --reload
+```
+
+Open `http://localhost:8000`, click **Start camera**, and approve the browser's webcam permission prompt. Webcam access on a deployed public site requires HTTPS; Render supplies HTTPS for its public URLs. A local `localhost` page is also treated as a secure context by browsers.
+
+The health check is available at `GET /health`. Frames are decoded in the backend and processed by the existing `AirPadEngine`; browser frames are sent over `/ws` and returned as JPEG images. The service keeps frame input capped at 640 × 480 and approximately 10 FPS to limit bandwidth and CPU use. One engine instance (including its hand tracker and canvas) is created per WebSocket connection.
+
+### Production start command
+
+```bash
+uvicorn airpad.web:app --host 0.0.0.0 --port "$PORT"
+```
+
+On Windows PowerShell local use, set a port with `$env:PORT=8000` before running a similar command.
+
+### Render settings
+
+| Setting | Value |
+| --- | --- |
+| Root Directory | `.` |
+| Runtime | Python |
+| Python Version | `3.12` |
+| Build Command | `pip install -r requirements.txt` |
+| Start Command | `uvicorn airpad.web:app --host 0.0.0.0 --port $PORT` |
+
+The hand model is downloaded to `models/hand_landmarker.task` on first processing connection if it is not already committed or available locally. Render's filesystem may be ephemeral, so the service validates and downloads it again after a fresh deployment when necessary.
+
+## Desktop quick start (Windows)
 
 ```powershell
 cd F:\Projects\Scratch-Pad

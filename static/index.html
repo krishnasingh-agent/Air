@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>AirPad</title>
+  <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+  <main>
+    <header>
+      <div><h1>AirPad</h1><p>Draw in the air with your hand.</p></div>
+      <div class="header-actions">
+        <button id="start" type="button">Start camera</button>
+        <button id="stop" type="button" disabled>Stop camera</button>
+      </div>
+    </header>
+
+    <section class="status" id="status" role="status">Camera is off. Browser permission is required to start.</section>
+    <div class="stage"><canvas id="video"></canvas></div>
+
+    <section class="controls" aria-label="Drawing controls">
+      <button data-action="undo">Undo</button>
+      <button data-action="redo">Redo</button>
+      <button data-action="clear">Clear</button>
+      <button data-action="toggle_eraser" id="eraser">Pen / eraser</button>
+      <button data-action="size:-">Brush −</button>
+      <button data-action="size:+">Brush +</button>
+      <button data-action="board">Board mode</button>
+      <button data-action="landmarks">Landmarks</button>
+      <button data-action="mirror">Mirror</button>
+      <button data-action="picker">Color picker</button>
+    </section>
+
+    <details><summary>Gestures</summary><p><b>Index finger up</b>: draw · <b>two fingers</b>: move/select · <b>open palm</b>: erase · point at the rendered toolbar and hold to activate it.</p></details>
+    <video id="source" playsinline muted hidden></video>
+  </main>
+  <script src="/static/app.js"></script>
+</body>
+</html>
