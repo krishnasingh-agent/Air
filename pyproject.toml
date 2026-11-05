@@ -5,7 +5,7 @@ description = "Draw and write in the air with your index finger (webcam + MediaP
 requires-python = ">=3.10"
 dependencies = [
     "mediapipe>=0.10.21,<1.0",
-    "opencv-contrib-python>=4.11,<5",
+    "opencv-python-headless>=4.11,<5",
     "numpy>=1.26,<3",
     "fastapi>=0.115,<1",
     "uvicorn[standard]>=0.34,<1",
